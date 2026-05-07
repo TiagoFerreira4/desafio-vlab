@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LessonStatus {
+  DRAFT     @map("draft")
+  PUBLISHED @map("published")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  courses   Course[] @relation("CourseCreator")
+
+  @@map("users")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  creatorId   String   @map("creator_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  creator     User     @relation("CourseCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+
+  @@map("courses")
+}
+
+model Lesson {
+  id        String       @id @default(cuid())
+  title     String
+  status    LessonStatus @default(DRAFT)
+  videoUrl  String?      @map("video_url")
+  courseId  String       @map("course_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  course    Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("lessons")
+}

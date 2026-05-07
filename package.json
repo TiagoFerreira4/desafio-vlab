@@ -1,0 +1,12 @@
+{
+  "name": "desafio-vlab",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev:backend": "pnpm --filter backend dev",
+    "build:backend": "pnpm --filter backend build",
+    "prisma:generate": "pnpm --filter backend prisma:generate",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  }
+}
