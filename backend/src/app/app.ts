@@ -5,6 +5,7 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 
+import { registerSwaggerDocs } from "../shared/http/docs/swagger.js";
 import { registerErrorHandler } from "../shared/http/errors/error-handler.js";
 import { env } from "../shared/infra/env/env.js";
 import { registerAppRoutes } from "./routes.js";
@@ -23,6 +24,8 @@ export async function buildApp() {
       expiresIn: env.JWT_EXPIRES_IN,
     },
   });
+
+  await registerSwaggerDocs(app);
 
   registerErrorHandler(app);
 

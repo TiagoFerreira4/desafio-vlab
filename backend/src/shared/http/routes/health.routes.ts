@@ -16,6 +16,9 @@ export async function healthRoutes(app: FastifyInstance) {
     "/health",
     {
       schema: {
+        tags: ["Health"],
+        summary: "Health check",
+        description: "Checks that the API and database are available.",
         response: {
           200: healthResponseSchema,
         },

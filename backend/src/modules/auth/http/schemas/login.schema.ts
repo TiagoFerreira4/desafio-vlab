@@ -8,6 +8,9 @@ export const loginBodySchema = z.object({
 });
 
 export const loginRouteSchema = {
+  tags: ["Auth"],
+  summary: "Login",
+  description: "Authenticates a user with email and password.",
   body: loginBodySchema,
   response: {
     200: authResponseSchema,

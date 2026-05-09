@@ -9,6 +9,9 @@ export const registerBodySchema = z.object({
 });
 
 export const registerRouteSchema = {
+  tags: ["Auth"],
+  summary: "Register user",
+  description: "Creates a user account and returns a JWT token.",
   body: registerBodySchema,
   response: {
     201: authResponseSchema,
