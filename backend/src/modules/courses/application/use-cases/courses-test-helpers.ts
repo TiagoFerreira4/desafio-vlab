@@ -8,10 +8,16 @@ import type {
 export class InMemoryCoursesRepository implements CoursesRepository {
   public readonly items = new Map<string, CourseRecord>();
 
-  async findManyByCreatorId(creatorId: string) {
-    return [...this.items.values()].filter(
-      (course) => course.creatorId === creatorId,
-    );
+  async findManyByCreatorId(input: { creatorId: string; search?: string }) {
+    const search = input.search?.toLowerCase();
+
+    return [...this.items.values()].filter((course) => {
+      const belongsToCreator = course.creatorId === input.creatorId;
+      const matchesSearch =
+        !search || course.name.toLowerCase().includes(search);
+
+      return belongsToCreator && matchesSearch;
+    });
   }
 
   async findById(id: string) {

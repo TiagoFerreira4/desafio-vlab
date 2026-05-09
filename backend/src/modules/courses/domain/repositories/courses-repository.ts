@@ -24,8 +24,13 @@ export interface UpdateCourseInput {
   endDate: Date;
 }
 
+export interface FindManyCoursesInput {
+  creatorId: string;
+  search?: string;
+}
+
 export interface CoursesRepository {
-  findManyByCreatorId(creatorId: string): Promise<CourseRecord[]>;
+  findManyByCreatorId(input: FindManyCoursesInput): Promise<CourseRecord[]>;
   findById(id: string): Promise<CourseRecord | null>;
   create(input: CreateCourseInput): Promise<CourseRecord>;
   update(id: string, input: UpdateCourseInput): Promise<CourseRecord>;

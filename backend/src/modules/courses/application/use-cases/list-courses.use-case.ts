@@ -5,6 +5,7 @@ import type { CoursesRepository } from "../../domain/repositories/courses-reposi
 
 export interface ListCoursesInput {
   creatorId: string;
+  search?: string;
 }
 
 export class ListCoursesUseCase
@@ -13,9 +14,12 @@ export class ListCoursesUseCase
   constructor(private readonly coursesRepository: CoursesRepository) {}
 
   async execute(input: ListCoursesInput) {
-    const courses = await this.coursesRepository.findManyByCreatorId(
-      input.creatorId,
-    );
+    const search = input.search?.trim() || undefined;
+
+    const courses = await this.coursesRepository.findManyByCreatorId({
+      creatorId: input.creatorId,
+      search,
+    });
 
     return {
       courses: courses.map(toCourseDto),

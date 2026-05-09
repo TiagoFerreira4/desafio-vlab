@@ -23,9 +23,19 @@ function toCourseRecord(course: Course): CourseRecord {
 export class PrismaCoursesRepository implements CoursesRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findManyByCreatorId(creatorId: string) {
+  async findManyByCreatorId(input: { creatorId: string; search?: string }) {
     const courses = await this.prisma.course.findMany({
-      where: { creatorId },
+      where: {
+        creatorId: input.creatorId,
+        ...(input.search
+          ? {
+              name: {
+                contains: input.search,
+                mode: "insensitive" as const,
+              },
+            }
+          : {}),
+      },
       orderBy: {
         createdAt: "desc",
       },
