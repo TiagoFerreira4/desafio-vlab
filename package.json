@@ -4,6 +4,7 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev:backend": "pnpm --filter backend dev",
+    "test": "pnpm --filter backend test",
     "build:backend": "pnpm --filter backend build",
     "prisma:generate": "pnpm --filter backend prisma:generate",
     "docker:up": "docker compose up --build",
