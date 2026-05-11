@@ -1,0 +1,28 @@
+import { Navigate, Route, Routes } from "react-router-dom";
+
+import { LoginPage } from "./features/auth/pages/login-page";
+import { RegisterPage } from "./features/auth/pages/register-page";
+import { DashboardPage } from "./pages/dashboard-page";
+import { AuthenticatedLayout } from "./shared/components/authenticated-layout";
+import { ProtectedRoute } from "./shared/components/protected-route";
+import { PublicRoute } from "./shared/components/public-route";
+
+export function App() {
+  return (
+    <Routes>
+      <Route element={<PublicRoute />}>
+        <Route element={<LoginPage />} path="/login" />
+        <Route element={<RegisterPage />} path="/register" />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AuthenticatedLayout />}>
+          <Route element={<DashboardPage />} path="/dashboard" />
+        </Route>
+      </Route>
+
+      <Route element={<Navigate replace to="/dashboard" />} path="/" />
+      <Route element={<Navigate replace to="/dashboard" />} path="*" />
+    </Routes>
+  );
+}
