@@ -1,18 +1,7 @@
-export interface UserRecord {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-}
-
-export interface CreateUserInput {
-  name: string;
-  email: string;
-  passwordHash: string;
-}
+import type { User } from "../entities/user.js";
 
 export interface UsersRepository {
-  findByEmail(email: string): Promise<UserRecord | null>;
-  findById(id: string): Promise<UserRecord | null>;
-  create(input: CreateUserInput): Promise<UserRecord>;
+  findByEmail(email: string): Promise<User | null>;
+  findById(id: string): Promise<User | null>;
+  create(input: User): Promise<User>;
 }

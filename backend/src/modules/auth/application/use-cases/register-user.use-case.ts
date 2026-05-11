@@ -1,5 +1,6 @@
 import type { UseCase } from "../../../../shared/application/use-case.js";
 import type { UsersRepository } from "../../../../modules/users/domain/repositories/users-repository.js";
+import { User } from "../../../../modules/users/domain/entities/user.js";
 import { UserAlreadyExistsError } from "../../domain/errors/user-already-exists-error.js";
 import type { PasswordHasher } from "../../infra/services/password-hasher.js";
 import type { TokenService } from "../../infra/services/token-service.js";
@@ -25,11 +26,11 @@ export class RegisterUserUseCase
 
     const passwordHash = await this.passwordHasher.hash(input.password);
 
-    const user = await this.usersRepository.create({
+    const user = await this.usersRepository.create(User.create({
       name: input.name,
       email: input.email,
       passwordHash,
-    });
+    }));
 
     const token = await this.tokenService.sign({
       sub: user.id,

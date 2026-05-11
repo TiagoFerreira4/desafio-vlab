@@ -1,18 +1,15 @@
 import type { PrismaClient, User } from "@prisma/client";
 
-import type {
-  CreateUserInput,
-  UserRecord,
-  UsersRepository,
-} from "../../domain/repositories/users-repository.js";
+import { User as UserEntity } from "../../domain/entities/user.js";
+import type { UsersRepository } from "../../domain/repositories/users-repository.js";
 
-function toUserRecord(user: User): UserRecord {
-  return {
+function toUserEntity(user: User) {
+  return UserEntity.restore({
     id: user.id,
     name: user.name,
     email: user.email,
     passwordHash: user.passwordHash,
-  };
+  });
 }
 
 export class PrismaUsersRepository implements UsersRepository {
@@ -20,10 +17,10 @@ export class PrismaUsersRepository implements UsersRepository {
 
   async findByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
-      where: { email },
+      where: { email: email.trim().toLowerCase() },
     });
 
-    return user ? toUserRecord(user) : null;
+    return user ? toUserEntity(user) : null;
   }
 
   async findById(id: string) {
@@ -31,10 +28,10 @@ export class PrismaUsersRepository implements UsersRepository {
       where: { id },
     });
 
-    return user ? toUserRecord(user) : null;
+    return user ? toUserEntity(user) : null;
   }
 
-  async create(input: CreateUserInput) {
+  async create(input: UserEntity) {
     const user = await this.prisma.user.create({
       data: {
         name: input.name,
@@ -43,6 +40,6 @@ export class PrismaUsersRepository implements UsersRepository {
       },
     });
 
-    return toUserRecord(user);
+    return toUserEntity(user);
   }
 }

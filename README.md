@@ -2,6 +2,40 @@
 
 ## Backend
 
+### Pré-requisitos
+
+- Node.js 24 ou compatível com o projeto.
+- pnpm 10.
+- Docker e Docker Compose.
+
+### Setup Local
+
+Instale as dependências:
+
+```bash
+pnpm install
+```
+
+Crie o arquivo de ambiente do backend:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+Suba o banco de dados:
+
+```bash
+docker compose up -d db
+```
+
+Execute as migrations:
+
+```bash
+pnpm --filter backend prisma:deploy
+```
+
+Inicie o backend:
+
 ```bash
 pnpm dev:backend
 ```
@@ -18,6 +52,16 @@ A especificação OpenAPI em JSON fica em:
 http://localhost:3333/docs/json
 ```
 
+### Setup Com Docker Compose
+
+Para subir banco e backend juntos:
+
+```bash
+docker compose up --build
+```
+
+O container do backend executa as migrations automaticamente antes de iniciar a API.
+
 ## Testando Rotas Protegidas No Swagger
 
 1. Execute `POST /auth/register` ou `POST /auth/login`.
@@ -30,6 +74,29 @@ Bearer <token>
 ```
 
 Depois disso, as rotas protegidas, como `/auth/me` e `/courses`, podem ser executadas pela própria UI do Swagger.
+
+## Autenticação
+
+O backend usa JWT stateless. As rotas `POST /auth/register` e `POST /auth/login` retornam:
+
+```json
+{
+  "user": {
+    "id": "user-id",
+    "name": "User Name",
+    "email": "user@example.com"
+  },
+  "token": "jwt-token"
+}
+```
+
+Rotas protegidas devem receber o header:
+
+```text
+Authorization: Bearer <token>
+```
+
+Como a autenticação é stateless, logout no frontend significa remover o token salvo localmente.
 
 ## Rotas De Courses
 
@@ -105,4 +172,11 @@ Regras principais:
 
 ```bash
 pnpm test
+```
+
+Também é possível rodar os comandos diretamente no pacote do backend:
+
+```bash
+pnpm --filter backend test
+pnpm --filter backend build
 ```

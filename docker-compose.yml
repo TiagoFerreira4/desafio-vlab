@@ -28,6 +28,8 @@ services:
       NODE_ENV: development
       HOST: 0.0.0.0
       PORT: 3333
+      JWT_SECRET: super-secret-key
+      JWT_EXPIRES_IN: 7d
       DATABASE_URL: postgresql://postgres:postgres@db:5432/coursesphere?schema=public
     ports:
       - "3333:3333"

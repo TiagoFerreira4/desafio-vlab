@@ -1,4 +1,4 @@
-import type { UserRecord } from "../../../../modules/users/domain/repositories/users-repository.js";
+import type { User } from "../../../../modules/users/domain/entities/user.js";
 
 export interface PublicUserDto {
   id: string;
@@ -16,7 +16,7 @@ export interface ProfileResponseDto {
 }
 
 export function toPublicUserDto(
-  user: Pick<UserRecord, "id" | "name" | "email">,
+  user: Pick<User, "id" | "name" | "email">,
 ): PublicUserDto {
   return {
     id: user.id,
