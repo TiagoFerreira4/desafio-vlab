@@ -24,6 +24,7 @@ export async function registerSwaggerDocs(app: FastifyInstance) {
       tags: [
         { name: "Auth", description: "Authentication and current user." },
         { name: "Courses", description: "Authenticated course management." },
+        { name: "Lessons", description: "Authenticated lesson management." },
         { name: "Health", description: "Service health checks." },
       ],
       components: {

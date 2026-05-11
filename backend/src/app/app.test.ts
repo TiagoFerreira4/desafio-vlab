@@ -32,6 +32,8 @@ describe("OpenAPI docs", () => {
     expect(spec.paths).toHaveProperty("/auth/login");
     expect(spec.paths).toHaveProperty("/auth/me");
     expect(spec.paths).toHaveProperty("/courses/");
+    expect(spec.paths).toHaveProperty("/courses/{courseId}/lessons/");
+    expect(spec.paths).toHaveProperty("/courses/{courseId}/lessons/{lessonId}");
     expect(spec.components?.securitySchemes).toHaveProperty("bearerAuth");
   });
 });
