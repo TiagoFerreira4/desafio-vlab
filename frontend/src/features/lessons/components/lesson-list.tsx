@@ -1,3 +1,5 @@
+import { Pencil, PlayCircle, Trash2 } from "lucide-react";
+
 import { formatDate } from "../../../shared/utils/date-format";
 import type { Lesson } from "../types";
 
@@ -38,6 +40,7 @@ export function LessonList({
               <p>
                 {lesson.videoUrl ? (
                   <a href={lesson.videoUrl} rel="noreferrer" target="_blank">
+                    <PlayCircle aria-hidden="true" size={17} />
                     Abrir video
                   </a>
                 ) : (
@@ -64,6 +67,7 @@ export function LessonList({
                 onClick={() => onEdit(lesson)}
                 type="button"
               >
+                <Pencil aria-hidden="true" size={18} />
                 {isEditing ? "Editando" : "Editar"}
               </button>
 
@@ -73,6 +77,7 @@ export function LessonList({
                 onClick={() => onDelete(lesson)}
                 type="button"
               >
+                <Trash2 aria-hidden="true" size={18} />
                 {isDeleting ? "Excluindo..." : "Excluir"}
               </button>
             </div>

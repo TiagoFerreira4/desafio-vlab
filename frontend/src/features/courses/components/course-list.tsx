@@ -1,3 +1,4 @@
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { formatDate } from "../../../shared/utils/date-format";
@@ -51,6 +52,7 @@ export function CourseList({
                 className="button-link secondary-button"
                 to={`/courses/${course.id}`}
               >
+                <Eye aria-hidden="true" size={18} />
                 Ver aulas
               </Link>
 
@@ -60,6 +62,7 @@ export function CourseList({
                 onClick={() => onEdit(course)}
                 type="button"
               >
+                <Pencil aria-hidden="true" size={18} />
                 {isEditing ? "Editando" : "Editar"}
               </button>
 
@@ -69,6 +72,7 @@ export function CourseList({
                 onClick={() => onDelete(course)}
                 type="button"
               >
+                <Trash2 aria-hidden="true" size={18} />
                 {isDeleting ? "Excluindo..." : "Excluir"}
               </button>
             </div>

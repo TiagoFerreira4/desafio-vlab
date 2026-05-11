@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getAuthErrorMessage } from "../auth-errors";
@@ -90,6 +91,7 @@ export function RegisterPage() {
           {error ? <p className="form-error">{error}</p> : null}
 
           <button disabled={isSubmitting} type="submit">
+            <UserPlus aria-hidden="true" size={18} />
             {isSubmitting ? "Criando..." : "Criar conta"}
           </button>
         </form>

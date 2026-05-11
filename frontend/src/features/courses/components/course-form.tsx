@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { Save, X } from "lucide-react";
 
 import { toDateInputValue } from "../../../shared/utils/date-format";
 import type { Course } from "../types";
@@ -163,6 +164,7 @@ export function CourseForm({
 
         <div className="form-actions">
           <button disabled={isSubmitting} type="submit">
+            <Save aria-hidden="true" size={18} />
             {isSubmitting
               ? isEditing
                 ? "Salvando..."
@@ -179,6 +181,7 @@ export function CourseForm({
               onClick={onCancel}
               type="button"
             >
+              <X aria-hidden="true" size={18} />
               Cancelar
             </button>
           ) : null}

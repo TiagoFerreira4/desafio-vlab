@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import { formatDate } from "../../../shared/utils/date-format";
@@ -40,6 +41,7 @@ export function CourseDetailsPage() {
         </div>
 
         <Link className="button-link secondary-button" to="/dashboard">
+          <ArrowLeft aria-hidden="true" size={18} />
           Voltar
         </Link>
       </section>

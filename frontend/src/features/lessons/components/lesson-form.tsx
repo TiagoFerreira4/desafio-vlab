@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { Save, X } from "lucide-react";
 
 import type { Lesson, LessonFormInput, LessonStatus } from "../types";
 
@@ -150,6 +151,7 @@ export function LessonForm({
 
         <div className="form-actions">
           <button disabled={isSubmitting} type="submit">
+            <Save aria-hidden="true" size={18} />
             {isSubmitting
               ? isEditing
                 ? "Salvando..."
@@ -166,6 +168,7 @@ export function LessonForm({
               onClick={onCancel}
               type="button"
             >
+              <X aria-hidden="true" size={18} />
               Cancelar
             </button>
           ) : null}

@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { Search, X } from "lucide-react";
 
 type CourseSearchProps = {
   initialValue: string;
@@ -38,6 +39,7 @@ export function CourseSearch({
 
       <div className="course-search-actions">
         <button disabled={isLoading} type="submit">
+          <Search aria-hidden="true" size={18} />
           Buscar
         </button>
         <button
@@ -46,6 +48,7 @@ export function CourseSearch({
           onClick={handleClear}
           type="button"
         >
+          <X aria-hidden="true" size={18} />
           Limpar
         </button>
       </div>

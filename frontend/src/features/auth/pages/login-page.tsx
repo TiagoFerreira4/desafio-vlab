@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { LogIn } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { getAuthErrorMessage } from "../auth-errors";
@@ -80,6 +81,7 @@ export function LoginPage() {
           {error ? <p className="form-error">{error}</p> : null}
 
           <button disabled={isSubmitting} type="submit">
+            <LogIn aria-hidden="true" size={18} />
             {isSubmitting ? "Entrando..." : "Entrar"}
           </button>
         </form>
