@@ -8,8 +8,9 @@ Aplicacao full stack para gestao de cursos online e aulas. O projeto tem API RES
 - Rotas protegidas no frontend e no backend.
 - CRUD de cursos do usuario autenticado.
 - CRUD de aulas por curso.
-- Permissoes por criador: somente o dono consulta, edita e remove seus cursos e aulas.
+- Permissoes por criador: todos os usuarios autenticados consultam cursos, mas apenas o criador cria, edita e remove seus cursos e aulas.
 - Catalogo com todos os cursos da plataforma em modo leitura.
+- Aulas em rascunho visiveis apenas para o criador do curso; demais usuarios veem somente aulas publicadas.
 - Busca de cursos por nome.
 - Filtro de aulas por status `draft` ou `published`.
 - Consumo da Random User API no frontend para sugerir um instrutor convidado na tela de detalhes do curso.
