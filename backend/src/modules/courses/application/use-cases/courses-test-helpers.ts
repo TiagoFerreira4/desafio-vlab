@@ -1,12 +1,16 @@
-import type {
-  CourseRecord,
-  CoursesRepository,
-  CreateCourseInput,
-  UpdateCourseInput,
-} from "../../domain/repositories/courses-repository.js";
+import { Course } from "../../domain/entities/course.js";
+import type { CoursesRepository } from "../../domain/repositories/courses-repository.js";
+
+interface CreateCourseTestInput {
+  name: string;
+  description?: string | null;
+  startDate: Date;
+  endDate: Date;
+  creatorId: string;
+}
 
 export class InMemoryCoursesRepository implements CoursesRepository {
-  public readonly items = new Map<string, CourseRecord>();
+  public readonly items = new Map<string, Course>();
 
   async findManyByCreatorId(input: { creatorId: string; search?: string }) {
     const search = input.search?.toLowerCase();
@@ -24,43 +28,46 @@ export class InMemoryCoursesRepository implements CoursesRepository {
     return this.items.get(id) ?? null;
   }
 
-  async create(input: CreateCourseInput) {
+  async create(input: Course | CreateCourseTestInput) {
+    const course = input instanceof Course ? input : Course.create(input);
     const now = new Date("2026-05-09T12:00:00.000Z");
-    const course: CourseRecord = {
+    const persistedCourse = Course.restore({
       id: `course-${this.items.size + 1}`,
-      name: input.name,
-      description: input.description ?? null,
-      startDate: input.startDate,
-      endDate: input.endDate,
-      creatorId: input.creatorId,
+      name: course.name,
+      description: course.description,
+      startDate: course.startDate,
+      endDate: course.endDate,
+      creatorId: course.creatorId,
       createdAt: now,
       updatedAt: now,
-    };
+    });
 
-    this.items.set(course.id, course);
+    this.items.set(persistedCourse.id, persistedCourse);
 
-    return course;
+    return persistedCourse;
   }
 
-  async update(id: string, input: UpdateCourseInput) {
-    const current = this.items.get(id);
+  async update(course: Course) {
+    const current = this.items.get(course.id);
 
     if (!current) {
       throw new Error("Course not found.");
     }
 
-    const course: CourseRecord = {
-      ...current,
-      name: input.name,
-      description: input.description ?? null,
-      startDate: input.startDate,
-      endDate: input.endDate,
+    const persistedCourse = Course.restore({
+      id: current.id,
+      name: course.name,
+      description: course.description,
+      startDate: course.startDate,
+      endDate: course.endDate,
+      creatorId: current.creatorId,
+      createdAt: current.createdAt,
       updatedAt: new Date("2026-05-09T13:00:00.000Z"),
-    };
+    });
 
-    this.items.set(id, course);
+    this.items.set(persistedCourse.id, persistedCourse);
 
-    return course;
+    return persistedCourse;
   }
 
   async delete(id: string) {

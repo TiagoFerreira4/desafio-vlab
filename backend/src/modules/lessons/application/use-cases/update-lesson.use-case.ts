@@ -5,7 +5,6 @@ import type { LessonResponseDto } from "../dto/lesson.dto.js";
 import { toLessonDto } from "../dto/lesson.dto.js";
 import type { UpdateLessonInputDto } from "../dto/update-lesson.dto.js";
 import type { LessonsRepository } from "../../domain/repositories/lessons-repository.js";
-import { normalizeLessonInput } from "./lesson-input.js";
 import {
   ensureLessonBelongsToCourse,
   ensureLessonExists,
@@ -29,11 +28,9 @@ export class UpdateLessonUseCase
       await this.lessonsRepository.findById(input.lessonId),
     );
     ensureLessonBelongsToCourse(existingLesson, input.courseId);
+    existingLesson.update(input);
 
-    const lesson = await this.lessonsRepository.update(
-      input.lessonId,
-      normalizeLessonInput(input),
-    );
+    const lesson = await this.lessonsRepository.update(existingLesson);
 
     return {
       lesson: toLessonDto(lesson),

@@ -1,4 +1,4 @@
-import type { LessonRecord } from "../../domain/repositories/lessons-repository.js";
+import type { Lesson } from "../../domain/entities/lesson.js";
 
 export interface LessonDto {
   id: string;
@@ -18,7 +18,7 @@ export interface LessonListResponseDto {
   lessons: LessonDto[];
 }
 
-export function toLessonDto(lesson: LessonRecord): LessonDto {
+export function toLessonDto(lesson: Lesson): LessonDto {
   return {
     id: lesson.id,
     title: lesson.title,

@@ -1,12 +1,15 @@
-import type {
-  CreateLessonInput,
-  LessonRecord,
-  LessonsRepository,
-  UpdateLessonInput,
-} from "../../domain/repositories/lessons-repository.js";
+import { Lesson } from "../../domain/entities/lesson.js";
+import type { LessonsRepository } from "../../domain/repositories/lessons-repository.js";
+
+interface CreateLessonTestInput {
+  title: string;
+  status: string;
+  videoUrl?: string | null;
+  courseId: string;
+}
 
 export class InMemoryLessonsRepository implements LessonsRepository {
-  public readonly items = new Map<string, LessonRecord>();
+  public readonly items = new Map<string, Lesson>();
 
   async findManyByCourseId(courseId: string) {
     return [...this.items.values()].filter(
@@ -18,41 +21,44 @@ export class InMemoryLessonsRepository implements LessonsRepository {
     return this.items.get(id) ?? null;
   }
 
-  async create(input: CreateLessonInput) {
+  async create(input: Lesson | CreateLessonTestInput) {
+    const lesson = input instanceof Lesson ? input : Lesson.create(input);
     const now = new Date("2026-05-09T12:00:00.000Z");
-    const lesson: LessonRecord = {
+    const persistedLesson = Lesson.restore({
       id: `lesson-${this.items.size + 1}`,
-      title: input.title,
-      status: input.status,
-      videoUrl: input.videoUrl ?? null,
-      courseId: input.courseId,
+      title: lesson.title,
+      status: lesson.status,
+      videoUrl: lesson.videoUrl,
+      courseId: lesson.courseId,
       createdAt: now,
       updatedAt: now,
-    };
+    });
 
-    this.items.set(lesson.id, lesson);
+    this.items.set(persistedLesson.id, persistedLesson);
 
-    return lesson;
+    return persistedLesson;
   }
 
-  async update(id: string, input: UpdateLessonInput) {
-    const current = this.items.get(id);
+  async update(lesson: Lesson) {
+    const current = this.items.get(lesson.id);
 
     if (!current) {
       throw new Error("Lesson not found.");
     }
 
-    const lesson: LessonRecord = {
-      ...current,
-      title: input.title,
-      status: input.status,
-      videoUrl: input.videoUrl ?? null,
+    const persistedLesson = Lesson.restore({
+      id: current.id,
+      title: lesson.title,
+      status: lesson.status,
+      videoUrl: lesson.videoUrl,
+      courseId: current.courseId,
+      createdAt: current.createdAt,
       updatedAt: new Date("2026-05-09T13:00:00.000Z"),
-    };
+    });
 
-    this.items.set(id, lesson);
+    this.items.set(persistedLesson.id, persistedLesson);
 
-    return lesson;
+    return persistedLesson;
   }
 
   async delete(id: string) {

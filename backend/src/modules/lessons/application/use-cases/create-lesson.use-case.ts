@@ -4,8 +4,8 @@ import { ensureCourseExists, ensureCourseOwner } from "../../../courses/applicat
 import type { CreateLessonInputDto } from "../dto/create-lesson.dto.js";
 import type { LessonResponseDto } from "../dto/lesson.dto.js";
 import { toLessonDto } from "../dto/lesson.dto.js";
+import { Lesson } from "../../domain/entities/lesson.js";
 import type { LessonsRepository } from "../../domain/repositories/lessons-repository.js";
-import { normalizeLessonInput } from "./lesson-input.js";
 
 export class CreateLessonUseCase
   implements UseCase<CreateLessonInputDto, LessonResponseDto>
@@ -21,12 +21,7 @@ export class CreateLessonUseCase
     );
     ensureCourseOwner(course, input.userId);
 
-    const lessonInput = normalizeLessonInput(input);
-
-    const lesson = await this.lessonsRepository.create({
-      ...lessonInput,
-      courseId: input.courseId,
-    });
+    const lesson = await this.lessonsRepository.create(Lesson.create(input));
 
     return {
       lesson: toLessonDto(lesson),

@@ -1,4 +1,4 @@
-import type { CourseRecord } from "../../domain/repositories/courses-repository.js";
+import type { Course } from "../../domain/entities/course.js";
 
 export interface CourseDto {
   id: string;
@@ -19,7 +19,7 @@ export interface CourseListResponseDto {
   courses: CourseDto[];
 }
 
-export function toCourseDto(course: CourseRecord): CourseDto {
+export function toCourseDto(course: Course): CourseDto {
   return {
     id: course.id,
     name: course.name,

@@ -3,7 +3,6 @@ import type { CourseResponseDto } from "../dto/course.dto.js";
 import { toCourseDto } from "../dto/course.dto.js";
 import type { UpdateCourseInputDto } from "../dto/update-course.dto.js";
 import type { CoursesRepository } from "../../domain/repositories/courses-repository.js";
-import { normalizeCourseInput } from "./course-input.js";
 import { ensureCourseExists, ensureCourseOwner } from "./course-ownership.js";
 
 export class UpdateCourseUseCase
@@ -17,11 +16,9 @@ export class UpdateCourseUseCase
     );
 
     ensureCourseOwner(existingCourse, input.userId);
+    existingCourse.update(input);
 
-    const course = await this.coursesRepository.update(
-      input.id,
-      normalizeCourseInput(input),
-    );
+    const course = await this.coursesRepository.update(existingCourse);
 
     return {
       course: toCourseDto(course),

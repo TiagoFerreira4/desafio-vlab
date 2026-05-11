@@ -1,13 +1,11 @@
 import type { Lesson, PrismaClient } from "@prisma/client";
 import { LessonStatus as PrismaLessonStatus } from "@prisma/client";
 
-import type {
-  CreateLessonInput,
-  LessonRecord,
-  LessonStatus,
-  LessonsRepository,
-  UpdateLessonInput,
-} from "../../domain/repositories/lessons-repository.js";
+import {
+  Lesson as LessonEntity,
+  type LessonStatus,
+} from "../../domain/entities/lesson.js";
+import type { LessonsRepository } from "../../domain/repositories/lessons-repository.js";
 
 function toPrismaLessonStatus(status: LessonStatus) {
   return status === "draft"
@@ -19,8 +17,8 @@ function toLessonStatus(status: PrismaLessonStatus): LessonStatus {
   return status === PrismaLessonStatus.DRAFT ? "draft" : "published";
 }
 
-function toLessonRecord(lesson: Lesson): LessonRecord {
-  return {
+function toLessonEntity(lesson: Lesson) {
+  return LessonEntity.restore({
     id: lesson.id,
     title: lesson.title,
     status: toLessonStatus(lesson.status),
@@ -28,7 +26,7 @@ function toLessonRecord(lesson: Lesson): LessonRecord {
     courseId: lesson.courseId,
     createdAt: lesson.createdAt,
     updatedAt: lesson.updatedAt,
-  };
+  });
 }
 
 export class PrismaLessonsRepository implements LessonsRepository {
@@ -42,7 +40,7 @@ export class PrismaLessonsRepository implements LessonsRepository {
       },
     });
 
-    return lessons.map(toLessonRecord);
+    return lessons.map(toLessonEntity);
   }
 
   async findById(id: string) {
@@ -50,33 +48,33 @@ export class PrismaLessonsRepository implements LessonsRepository {
       where: { id },
     });
 
-    return lesson ? toLessonRecord(lesson) : null;
+    return lesson ? toLessonEntity(lesson) : null;
   }
 
-  async create(input: CreateLessonInput) {
-    const lesson = await this.prisma.lesson.create({
+  async create(lesson: LessonEntity) {
+    const createdLesson = await this.prisma.lesson.create({
       data: {
-        title: input.title,
-        status: toPrismaLessonStatus(input.status),
-        videoUrl: input.videoUrl,
-        courseId: input.courseId,
+        title: lesson.title,
+        status: toPrismaLessonStatus(lesson.status),
+        videoUrl: lesson.videoUrl,
+        courseId: lesson.courseId,
       },
     });
 
-    return toLessonRecord(lesson);
+    return toLessonEntity(createdLesson);
   }
 
-  async update(id: string, input: UpdateLessonInput) {
-    const lesson = await this.prisma.lesson.update({
-      where: { id },
+  async update(lesson: LessonEntity) {
+    const updatedLesson = await this.prisma.lesson.update({
+      where: { id: lesson.id },
       data: {
-        title: input.title,
-        status: toPrismaLessonStatus(input.status),
-        videoUrl: input.videoUrl,
+        title: lesson.title,
+        status: toPrismaLessonStatus(lesson.status),
+        videoUrl: lesson.videoUrl,
       },
     });
 
-    return toLessonRecord(lesson);
+    return toLessonEntity(updatedLesson);
   }
 
   async delete(id: string) {

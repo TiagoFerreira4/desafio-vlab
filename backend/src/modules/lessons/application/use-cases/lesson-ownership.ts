@@ -1,9 +1,9 @@
 import { LessonNotFoundError } from "../../domain/errors/lesson-not-found-error.js";
-import type { LessonRecord } from "../../domain/repositories/lessons-repository.js";
+import type { Lesson } from "../../domain/entities/lesson.js";
 
 export function ensureLessonExists(
-  lesson: LessonRecord | null,
-): LessonRecord {
+  lesson: Lesson | null,
+): Lesson {
   if (!lesson) {
     throw new LessonNotFoundError();
   }
@@ -12,10 +12,10 @@ export function ensureLessonExists(
 }
 
 export function ensureLessonBelongsToCourse(
-  lesson: LessonRecord,
+  lesson: Lesson,
   courseId: string,
 ) {
-  if (lesson.courseId !== courseId) {
+  if (!lesson.belongsToCourse(courseId)) {
     throw new LessonNotFoundError();
   }
 }

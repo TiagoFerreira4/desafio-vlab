@@ -1,28 +1,4 @@
-export interface CourseRecord {
-  id: string;
-  name: string;
-  description: string | null;
-  startDate: Date;
-  endDate: Date;
-  creatorId: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CreateCourseInput {
-  name: string;
-  description?: string | null;
-  startDate: Date;
-  endDate: Date;
-  creatorId: string;
-}
-
-export interface UpdateCourseInput {
-  name: string;
-  description?: string | null;
-  startDate: Date;
-  endDate: Date;
-}
+import type { Course } from "../entities/course.js";
 
 export interface FindManyCoursesInput {
   creatorId: string;
@@ -30,9 +6,9 @@ export interface FindManyCoursesInput {
 }
 
 export interface CoursesRepository {
-  findManyByCreatorId(input: FindManyCoursesInput): Promise<CourseRecord[]>;
-  findById(id: string): Promise<CourseRecord | null>;
-  create(input: CreateCourseInput): Promise<CourseRecord>;
-  update(id: string, input: UpdateCourseInput): Promise<CourseRecord>;
+  findManyByCreatorId(input: FindManyCoursesInput): Promise<Course[]>;
+  findById(id: string): Promise<Course | null>;
+  create(course: Course): Promise<Course>;
+  update(course: Course): Promise<Course>;
   delete(id: string): Promise<void>;
 }

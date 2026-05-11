@@ -1,32 +1,9 @@
-export type LessonStatus = "draft" | "published";
-
-export interface LessonRecord {
-  id: string;
-  title: string;
-  status: LessonStatus;
-  videoUrl: string | null;
-  courseId: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CreateLessonInput {
-  title: string;
-  status: LessonStatus;
-  videoUrl?: string | null;
-  courseId: string;
-}
-
-export interface UpdateLessonInput {
-  title: string;
-  status: LessonStatus;
-  videoUrl?: string | null;
-}
+import type { Lesson } from "../entities/lesson.js";
 
 export interface LessonsRepository {
-  findManyByCourseId(courseId: string): Promise<LessonRecord[]>;
-  findById(id: string): Promise<LessonRecord | null>;
-  create(input: CreateLessonInput): Promise<LessonRecord>;
-  update(id: string, input: UpdateLessonInput): Promise<LessonRecord>;
+  findManyByCourseId(courseId: string): Promise<Lesson[]>;
+  findById(id: string): Promise<Lesson | null>;
+  create(lesson: Lesson): Promise<Lesson>;
+  update(lesson: Lesson): Promise<Lesson>;
   delete(id: string): Promise<void>;
 }

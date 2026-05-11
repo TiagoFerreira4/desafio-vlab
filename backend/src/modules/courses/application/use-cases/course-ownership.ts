@@ -1,10 +1,10 @@
 import { CourseNotFoundError } from "../../domain/errors/course-not-found-error.js";
 import { UnauthorizedCourseActionError } from "../../domain/errors/unauthorized-course-action-error.js";
-import type { CourseRecord } from "../../domain/repositories/courses-repository.js";
+import type { Course } from "../../domain/entities/course.js";
 
 export function ensureCourseExists(
-  course: CourseRecord | null,
-): CourseRecord {
+  course: Course | null,
+): Course {
   if (!course) {
     throw new CourseNotFoundError();
   }
@@ -12,8 +12,8 @@ export function ensureCourseExists(
   return course;
 }
 
-export function ensureCourseOwner(course: CourseRecord, userId: string) {
-  if (course.creatorId !== userId) {
+export function ensureCourseOwner(course: Course, userId: string) {
+  if (!course.isCreatedBy(userId)) {
     throw new UnauthorizedCourseActionError();
   }
 }

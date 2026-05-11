@@ -1,14 +1,10 @@
 import type { Course, PrismaClient } from "@prisma/client";
 
-import type {
-  CourseRecord,
-  CoursesRepository,
-  CreateCourseInput,
-  UpdateCourseInput,
-} from "../../domain/repositories/courses-repository.js";
+import { Course as CourseEntity } from "../../domain/entities/course.js";
+import type { CoursesRepository } from "../../domain/repositories/courses-repository.js";
 
-function toCourseRecord(course: Course): CourseRecord {
-  return {
+function toCourseEntity(course: Course) {
+  return CourseEntity.restore({
     id: course.id,
     name: course.name,
     description: course.description,
@@ -17,7 +13,7 @@ function toCourseRecord(course: Course): CourseRecord {
     creatorId: course.creatorId,
     createdAt: course.createdAt,
     updatedAt: course.updatedAt,
-  };
+  });
 }
 
 export class PrismaCoursesRepository implements CoursesRepository {
@@ -41,7 +37,7 @@ export class PrismaCoursesRepository implements CoursesRepository {
       },
     });
 
-    return courses.map(toCourseRecord);
+    return courses.map(toCourseEntity);
   }
 
   async findById(id: string) {
@@ -49,35 +45,35 @@ export class PrismaCoursesRepository implements CoursesRepository {
       where: { id },
     });
 
-    return course ? toCourseRecord(course) : null;
+    return course ? toCourseEntity(course) : null;
   }
 
-  async create(input: CreateCourseInput) {
-    const course = await this.prisma.course.create({
+  async create(course: CourseEntity) {
+    const createdCourse = await this.prisma.course.create({
       data: {
-        name: input.name,
-        description: input.description,
-        startDate: input.startDate,
-        endDate: input.endDate,
-        creatorId: input.creatorId,
+        name: course.name,
+        description: course.description,
+        startDate: course.startDate,
+        endDate: course.endDate,
+        creatorId: course.creatorId,
       },
     });
 
-    return toCourseRecord(course);
+    return toCourseEntity(createdCourse);
   }
 
-  async update(id: string, input: UpdateCourseInput) {
-    const course = await this.prisma.course.update({
-      where: { id },
+  async update(course: CourseEntity) {
+    const updatedCourse = await this.prisma.course.update({
+      where: { id: course.id },
       data: {
-        name: input.name,
-        description: input.description,
-        startDate: input.startDate,
-        endDate: input.endDate,
+        name: course.name,
+        description: course.description,
+        startDate: course.startDate,
+        endDate: course.endDate,
       },
     });
 
-    return toCourseRecord(course);
+    return toCourseEntity(updatedCourse);
   }
 
   async delete(id: string) {
