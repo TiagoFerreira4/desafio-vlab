@@ -52,9 +52,30 @@ const lessons = [
   },
 ];
 
+const guestInstructor = {
+  results: [
+    {
+      name: {
+        first: "Helena",
+        last: "Martins",
+      },
+      email: "helena.martins@example.com",
+      picture: {
+        large:
+          "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2072%2072'%3E%3Crect%20width='72'%20height='72'%20fill='%23e8f4f7'/%3E%3Ccircle%20cx='36'%20cy='28'%20r='14'%20fill='%23166783'/%3E%3Cpath%20d='M14%2066c4-16%2018-24%2022-24s18%208%2022%2024'%20fill='%23166783'/%3E%3C/svg%3E",
+      },
+      nat: "BR",
+    },
+  ],
+};
+
 async function mockApi(page: Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem("coursesphere.token", "visual-test-token");
+  });
+
+  await page.route("https://randomuser.me/api/**", async (route) => {
+    await route.fulfill({ json: guestInstructor });
   });
 
   await page.route("http://localhost:3333/**", async (route) => {
@@ -133,6 +154,10 @@ test("course details handle lesson controls", async ({ page }, testInfo) => {
   await expect(
     page.getByRole("heading", { name: courses[0].name }).first(),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Instrutor convidado" }),
+  ).toBeVisible();
+  await expect(page.getByText("Helena Martins")).toBeVisible();
   await expect(page.getByText(lessons[0].title)).toBeVisible();
   await capture(page, testInfo, "course-details");
 });

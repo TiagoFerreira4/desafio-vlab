@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 
 import { formatDate } from "../../../shared/utils/date-format";
 import { useAuth } from "../../auth/auth-context";
+import { GuestInstructorCard } from "../../guest-instructor/components/guest-instructor-card";
+import { useGuestInstructor } from "../../guest-instructor/use-guest-instructor";
 import { LessonForm } from "../../lessons/components/lesson-form";
 import { LessonList } from "../../lessons/components/lesson-list";
 import { LessonStatusFilter } from "../../lessons/components/lesson-status-filter";
@@ -14,6 +16,7 @@ export function CourseDetailsPage() {
   const { courseId } = useParams();
   const { token } = useAuth();
   const courseState = useCourseDetails(courseId, token);
+  const guestInstructorState = useGuestInstructor(courseId);
   const lessonsState = useLessons(courseId, token);
 
   function handleDeleteLesson(lessonId: string, lessonTitle: string) {
@@ -76,6 +79,12 @@ export function CourseDetailsPage() {
               </div>
             </dl>
           </section>
+
+          <GuestInstructorCard
+            error={guestInstructorState.error}
+            instructor={guestInstructorState.instructor}
+            isLoading={guestInstructorState.isLoading}
+          />
 
           <div className="dashboard-grid lessons-grid">
             <LessonForm
