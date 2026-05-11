@@ -218,10 +218,18 @@ O `courseId` e usado como `seed`, entao o mesmo curso tende a exibir o mesmo ins
 
 ## Testes E Builds
 
+Rodar todos os testes pela raiz:
+
+```bash
+pnpm test:all
+```
+
 Rodar testes automatizados do backend:
 
 ```bash
 pnpm test
+# ou
+pnpm test:backend
 ```
 
 Build do backend:
@@ -236,10 +244,16 @@ Build do frontend:
 pnpm build:frontend
 ```
 
+Testes de componente do frontend:
+
+```bash
+pnpm test:component
+```
+
 Testes visuais do frontend:
 
 ```bash
-pnpm --filter frontend test:visual
+pnpm test:visual
 ```
 
 Comandos equivalentes por pacote:
@@ -248,5 +262,6 @@ Comandos equivalentes por pacote:
 pnpm --filter backend test
 pnpm --filter backend build
 pnpm --filter frontend build
+pnpm --filter frontend test:component
 pnpm --filter frontend test:visual
 ```
