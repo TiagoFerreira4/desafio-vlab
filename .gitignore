@@ -6,4 +6,5 @@ backend/.env
 backend/node_modules
 backend/dist
 .pnpm-store
+*.tsbuildinfo
 project.md
