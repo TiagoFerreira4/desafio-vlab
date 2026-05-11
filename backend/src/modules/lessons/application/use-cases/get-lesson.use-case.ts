@@ -1,9 +1,10 @@
 import type { UseCase } from "../../../../shared/application/use-case.js";
 import type { CoursesRepository } from "../../../courses/domain/repositories/courses-repository.js";
-import { ensureCourseExists, ensureCourseOwner } from "../../../courses/application/use-cases/course-ownership.js";
+import { ensureCourseExists } from "../../../courses/application/use-cases/course-ownership.js";
 import type { LessonResponseDto } from "../dto/lesson.dto.js";
 import { toLessonDto } from "../dto/lesson.dto.js";
 import type { LessonsRepository } from "../../domain/repositories/lessons-repository.js";
+import { LessonNotFoundError } from "../../domain/errors/lesson-not-found-error.js";
 import {
   ensureLessonBelongsToCourse,
   ensureLessonExists,
@@ -25,12 +26,15 @@ export class GetLessonUseCase implements UseCase<GetLessonInput, LessonResponseD
     const course = ensureCourseExists(
       await this.coursesRepository.findById(input.courseId),
     );
-    ensureCourseOwner(course, input.userId);
 
     const lesson = ensureLessonExists(
       await this.lessonsRepository.findById(input.lessonId),
     );
-    ensureLessonBelongsToCourse(lesson, input.courseId);
+    ensureLessonBelongsToCourse(lesson, course.id);
+
+    if (!course.isCreatedBy(input.userId) && lesson.status === "draft") {
+      throw new LessonNotFoundError();
+    }
 
     return {
       lesson: toLessonDto(lesson),

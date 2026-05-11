@@ -19,18 +19,35 @@ function toCourseEntity(course: Course) {
 export class PrismaCoursesRepository implements CoursesRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
+  private getSearchWhere(search?: string) {
+    return search
+      ? {
+          name: {
+            contains: search,
+            mode: "insensitive" as const,
+          },
+        }
+      : {};
+  }
+
   async findManyByCreatorId(input: { creatorId: string; search?: string }) {
     const courses = await this.prisma.course.findMany({
       where: {
         creatorId: input.creatorId,
-        ...(input.search
-          ? {
-              name: {
-                contains: input.search,
-                mode: "insensitive" as const,
-              },
-            }
-          : {}),
+        ...this.getSearchWhere(input.search),
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return courses.map(toCourseEntity);
+  }
+
+  async findMany(input: { search?: string }) {
+    const courses = await this.prisma.course.findMany({
+      where: {
+        ...this.getSearchWhere(input.search),
       },
       orderBy: {
         createdAt: "desc",

@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import { getApiErrorMessage } from "../../shared/api/api-errors";
 import * as coursesApi from "./courses-api";
-import type { Course, CourseFormInput } from "./types";
+import type { Course, CourseFormInput, CourseScope } from "./types";
 
-export function useCourses(token: string | null) {
+export function useCourses(token: string | null, scope: CourseScope) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState("");
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
@@ -26,7 +26,10 @@ export function useCourses(token: string | null) {
       setError(null);
 
       try {
-        const response = await coursesApi.listCourses(token, nextSearch);
+        const response = await coursesApi.listCourses(token, {
+          scope,
+          search: nextSearch,
+        });
         setCourses(response.courses);
       } catch (caughtError) {
         setError(getApiErrorMessage(caughtError));
@@ -34,7 +37,7 @@ export function useCourses(token: string | null) {
         setIsLoading(false);
       }
     },
-    [search, token],
+    [scope, search, token],
   );
 
   useEffect(() => {

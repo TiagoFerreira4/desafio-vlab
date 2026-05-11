@@ -6,7 +6,7 @@ import { GetLessonUseCase } from "./get-lesson.use-case.js";
 import { InMemoryLessonsRepository } from "./lessons-test-helpers.js";
 
 describe("GetLessonUseCase", () => {
-  it("returns a lesson from a course owned by the authenticated user", async () => {
+  it("returns a lesson from a course", async () => {
     const coursesRepository = new InMemoryCoursesRepository();
     const lessonsRepository = new InMemoryLessonsRepository();
     await coursesRepository.create({
@@ -37,6 +37,67 @@ describe("GetLessonUseCase", () => {
       title: "Introduction",
       courseId: "course-1",
     });
+  });
+
+  it("returns a published lesson to users who do not own the course", async () => {
+    const coursesRepository = new InMemoryCoursesRepository();
+    const lessonsRepository = new InMemoryLessonsRepository();
+    await coursesRepository.create({
+      name: "React Basics",
+      startDate: new Date("2026-05-10"),
+      endDate: new Date("2026-06-10"),
+      creatorId: "user-1",
+    });
+    await lessonsRepository.create({
+      courseId: "course-1",
+      title: "Published Introduction",
+      status: "published",
+    });
+
+    const useCase = new GetLessonUseCase(
+      lessonsRepository,
+      coursesRepository,
+    );
+
+    const result = await useCase.execute({
+      courseId: "course-1",
+      lessonId: "lesson-1",
+      userId: "user-2",
+    });
+
+    expect(result.lesson).toMatchObject({
+      id: "lesson-1",
+      status: "published",
+    });
+  });
+
+  it("hides draft lessons from users who do not own the course", async () => {
+    const coursesRepository = new InMemoryCoursesRepository();
+    const lessonsRepository = new InMemoryLessonsRepository();
+    await coursesRepository.create({
+      name: "React Basics",
+      startDate: new Date("2026-05-10"),
+      endDate: new Date("2026-06-10"),
+      creatorId: "user-1",
+    });
+    await lessonsRepository.create({
+      courseId: "course-1",
+      title: "Draft Introduction",
+      status: "draft",
+    });
+
+    const useCase = new GetLessonUseCase(
+      lessonsRepository,
+      coursesRepository,
+    );
+
+    await expect(
+      useCase.execute({
+        courseId: "course-1",
+        lessonId: "lesson-1",
+        userId: "user-2",
+      }),
+    ).rejects.toBeInstanceOf(LessonNotFoundError);
   });
 
   it("rejects unknown lessons", async () => {

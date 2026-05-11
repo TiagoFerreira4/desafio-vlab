@@ -9,6 +9,7 @@ Aplicacao full stack para gestao de cursos online e aulas. O projeto tem API RES
 - CRUD de cursos do usuario autenticado.
 - CRUD de aulas por curso.
 - Permissoes por criador: somente o dono consulta, edita e remove seus cursos e aulas.
+- Catalogo com todos os cursos da plataforma em modo leitura.
 - Busca de cursos por nome.
 - Filtro de aulas por status `draft` ou `published`.
 - Consumo da Random User API no frontend para sugerir um instrutor convidado na tela de detalhes do curso.
@@ -143,9 +144,10 @@ Todas as rotas de cursos exigem autenticacao via Bearer Token.
 
 | Metodo | Rota | Descricao |
 | --- | --- | --- |
-| `GET` | `/courses` | Lista os cursos criados pelo usuario autenticado. |
-| `GET` | `/courses?search=react` | Lista os cursos do usuario filtrando pelo nome. A busca e parcial e case-insensitive. |
-| `GET` | `/courses/:id` | Busca um curso especifico, desde que pertenca ao usuario autenticado. |
+| `GET` | `/courses` | Lista os cursos criados pelo usuario autenticado. Equivale a `scope=mine`. |
+| `GET` | `/courses?scope=mine&search=react` | Lista os cursos do usuario filtrando pelo nome. A busca e parcial e case-insensitive. |
+| `GET` | `/courses?scope=all&search=react` | Lista todos os cursos da plataforma para usuarios autenticados, em modo leitura no frontend. |
+| `GET` | `/courses/:id` | Busca um curso especifico. Qualquer usuario autenticado pode visualizar. |
 | `POST` | `/courses` | Cria um novo curso para o usuario autenticado. |
 | `PUT` | `/courses/:id` | Atualiza um curso do usuario autenticado. Deve enviar o corpo completo do curso. |
 | `DELETE` | `/courses/:id` | Remove um curso do usuario autenticado. |
@@ -167,7 +169,9 @@ Regras principais:
 - `description` e opcional.
 - `startDate` e `endDate` sao obrigatorios.
 - `endDate` deve ser igual ou posterior a `startDate`.
-- Apenas o criador do curso pode consultar, atualizar ou remover esse curso.
+- Qualquer usuario autenticado pode consultar cursos.
+- Apenas o criador do curso pode criar, atualizar ou remover esse curso.
+- No frontend, a aba `Todos os cursos` exibe cursos em modo leitura, inclusive quando o curso pertence ao usuario autenticado.
 
 ## Rotas De Lessons
 
@@ -175,8 +179,8 @@ Todas as rotas de aulas exigem autenticacao via Bearer Token e sao aninhadas em 
 
 | Metodo | Rota | Descricao |
 | --- | --- | --- |
-| `GET` | `/courses/:courseId/lessons` | Lista as aulas de um curso do usuario autenticado. |
-| `GET` | `/courses/:courseId/lessons/:lessonId` | Busca uma aula especifica do curso. |
+| `GET` | `/courses/:courseId/lessons` | Lista as aulas de um curso. Qualquer usuario autenticado pode visualizar. |
+| `GET` | `/courses/:courseId/lessons/:lessonId` | Busca uma aula especifica do curso. Qualquer usuario autenticado pode visualizar. |
 | `POST` | `/courses/:courseId/lessons` | Cria uma nova aula no curso. |
 | `PUT` | `/courses/:courseId/lessons/:lessonId` | Atualiza uma aula do curso. Deve enviar o corpo completo da aula. |
 | `DELETE` | `/courses/:courseId/lessons/:lessonId` | Remove uma aula do curso. |
@@ -197,7 +201,9 @@ Regras principais:
 - `status` e obrigatorio e aceita apenas `draft` ou `published`.
 - `videoUrl` e opcional, mas quando informado precisa ser uma URL valida.
 - Toda aula pertence a um curso.
-- Apenas o criador do curso pode consultar, criar, atualizar ou remover aulas desse curso.
+- Qualquer usuario autenticado pode consultar aulas publicadas.
+- Aulas em `draft` sao visiveis apenas para o criador do curso.
+- Apenas o criador do curso pode criar, atualizar ou remover aulas desse curso.
 
 ## API Externa
 

@@ -14,6 +14,7 @@ export function makeListCoursesController(useCase: ListCoursesUseCase) {
   ) {
     const result = await useCase.execute({
       creatorId: request.user.sub,
+      scope: request.query.scope,
       search: request.query.search,
     });
 

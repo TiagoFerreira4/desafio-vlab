@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { formatDate } from "../../../shared/utils/date-format";
 import { useAuth } from "../../auth/auth-context";
@@ -10,14 +10,24 @@ import { LessonList } from "../../lessons/components/lesson-list";
 import { LessonStatusFilter } from "../../lessons/components/lesson-status-filter";
 import { LessonsEmptyState } from "../../lessons/components/lessons-empty-state";
 import { useLessons } from "../../lessons/use-lessons";
+import type { CourseScope } from "../types";
 import { useCourseDetails } from "../use-course-details";
+
+function parseCourseScope(value: string | null): CourseScope {
+  return value === "all" ? "all" : "mine";
+}
 
 export function CourseDetailsPage() {
   const { courseId } = useParams();
-  const { token } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { token, user } = useAuth();
+  const scope = parseCourseScope(searchParams.get("scope"));
   const courseState = useCourseDetails(courseId, token);
   const guestInstructorState = useGuestInstructor(courseId);
   const lessonsState = useLessons(courseId, token);
+  const canManage =
+    scope === "mine" &&
+    Boolean(user && courseState.course?.creatorId === user.id);
 
   function handleDeleteLesson(lessonId: string, lessonTitle: string) {
     const shouldDelete = window.confirm(
@@ -43,7 +53,10 @@ export function CourseDetailsPage() {
           <h1>{courseState.course?.name ?? "Curso"}</h1>
         </div>
 
-        <Link className="button-link secondary-button" to="/dashboard">
+        <Link
+          className="button-link secondary-button"
+          to={scope === "all" ? "/dashboard?tab=all" : "/dashboard"}
+        >
           <ArrowLeft aria-hidden="true" size={18} />
           Voltar
         </Link>
@@ -86,23 +99,36 @@ export function CourseDetailsPage() {
             isLoading={guestInstructorState.isLoading}
           />
 
-          <div className="dashboard-grid lessons-grid">
-            <LessonForm
-              isSubmitting={lessonsState.isCreating || lessonsState.isSaving}
-              lesson={lessonsState.editingLesson}
-              onCancel={lessonsState.cancelEditing}
-              onSubmit={
-                lessonsState.editingLesson
-                  ? lessonsState.saveLesson
-                  : lessonsState.createLesson
-              }
-            />
+          <div
+            className={
+              canManage
+                ? "dashboard-grid lessons-grid"
+                : "dashboard-grid lessons-grid read-only-grid"
+            }
+          >
+            {canManage ? (
+              <LessonForm
+                isSubmitting={lessonsState.isCreating || lessonsState.isSaving}
+                lesson={lessonsState.editingLesson}
+                onCancel={lessonsState.cancelEditing}
+                onSubmit={
+                  lessonsState.editingLesson
+                    ? lessonsState.saveLesson
+                    : lessonsState.createLesson
+                }
+              />
+            ) : null}
 
             <section className="courses-panel" aria-labelledby="lessons-title">
               <div className="courses-panel-header">
                 <div>
                   <p className="eyebrow">Aulas</p>
                   <h2 id="lessons-title">Lista de aulas</h2>
+                  {!canManage ? (
+                    <p className="panel-note">
+                      Apenas aulas publicadas estao disponiveis.
+                    </p>
+                  ) : null}
                 </div>
 
                 <span className="counter-badge">
@@ -110,10 +136,12 @@ export function CourseDetailsPage() {
                 </span>
               </div>
 
-              <LessonStatusFilter
-                onChange={lessonsState.setStatusFilter}
-                value={lessonsState.statusFilter}
-              />
+              {canManage ? (
+                <LessonStatusFilter
+                  onChange={lessonsState.setStatusFilter}
+                  value={lessonsState.statusFilter}
+                />
+              ) : null}
 
               {lessonsState.error ? (
                 <div className="form-error" role="alert">
@@ -127,6 +155,7 @@ export function CourseDetailsPage() {
                 </section>
               ) : lessonsState.filteredLessons.length > 0 ? (
                 <LessonList
+                  canManage={canManage}
                   deletingLessonId={lessonsState.deletingLessonId}
                   editingLessonId={lessonsState.editingLesson?.id}
                   lessons={lessonsState.filteredLessons}

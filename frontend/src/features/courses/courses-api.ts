@@ -4,6 +4,7 @@ import type {
   CourseFormInput,
   CourseListResponse,
   CourseResponse,
+  CourseScope,
 } from "./types";
 
 function toCourseBody(input: CourseFormInput): CourseBody {
@@ -17,13 +18,20 @@ function toCourseBody(input: CourseFormInput): CourseBody {
   };
 }
 
-export function listCourses(token: string, search?: string) {
-  const trimmedSearch = search?.trim();
-  const query = trimmedSearch
-    ? `?search=${encodeURIComponent(trimmedSearch)}`
-    : "";
+export function listCourses(
+  token: string,
+  input: { scope: CourseScope; search?: string },
+) {
+  const params = new URLSearchParams({
+    scope: input.scope,
+  });
+  const trimmedSearch = input.search?.trim();
 
-  return apiRequest<CourseListResponse>(`/courses${query}`, {
+  if (trimmedSearch) {
+    params.set("search", trimmedSearch);
+  }
+
+  return apiRequest<CourseListResponse>(`/courses?${params.toString()}`, {
     token,
   });
 }

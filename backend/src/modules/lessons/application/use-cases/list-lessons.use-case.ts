@@ -1,6 +1,6 @@
 import type { UseCase } from "../../../../shared/application/use-case.js";
 import type { CoursesRepository } from "../../../courses/domain/repositories/courses-repository.js";
-import { ensureCourseExists, ensureCourseOwner } from "../../../courses/application/use-cases/course-ownership.js";
+import { ensureCourseExists } from "../../../courses/application/use-cases/course-ownership.js";
 import type { LessonListResponseDto } from "../dto/lesson.dto.js";
 import { toLessonDto } from "../dto/lesson.dto.js";
 import type { LessonsRepository } from "../../domain/repositories/lessons-repository.js";
@@ -22,11 +22,12 @@ export class ListLessonsUseCase
     const course = ensureCourseExists(
       await this.coursesRepository.findById(input.courseId),
     );
-    ensureCourseOwner(course, input.userId);
+    const isOwner = course.isCreatedBy(input.userId);
 
-    const lessons = await this.lessonsRepository.findManyByCourseId(
-      input.courseId,
-    );
+    const lessons = await this.lessonsRepository.findManyByCourseId({
+      courseId: course.id,
+      status: isOwner ? undefined : "published",
+    });
 
     return {
       lessons: lessons.map(toLessonDto),

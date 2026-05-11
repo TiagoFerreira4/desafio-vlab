@@ -24,7 +24,7 @@ const courses = [
     description: null,
     startDate: "2026-06-10T00:00:00.000Z",
     endDate: "2026-07-22T00:00:00.000Z",
-    creatorId: user.id,
+    creatorId: "user-2",
     createdAt: "2026-04-15T00:00:00.000Z",
     updatedAt: "2026-05-03T00:00:00.000Z",
   },
@@ -49,6 +49,27 @@ const lessons = [
     courseId: "course-1",
     createdAt: "2026-05-04T00:00:00.000Z",
     updatedAt: "2026-05-05T00:00:00.000Z",
+  },
+];
+
+const externalLessons = [
+  {
+    id: "lesson-3",
+    title: "Pesquisa exploratoria e entrevistas",
+    status: "published",
+    videoUrl: "https://videos.example.com/cursos/ux-research/aula-01",
+    courseId: "course-2",
+    createdAt: "2026-05-06T00:00:00.000Z",
+    updatedAt: "2026-05-07T00:00:00.000Z",
+  },
+  {
+    id: "lesson-4",
+    title: "Rascunho privado do criador",
+    status: "draft",
+    videoUrl: null,
+    courseId: "course-2",
+    createdAt: "2026-05-08T00:00:00.000Z",
+    updatedAt: "2026-05-09T00:00:00.000Z",
   },
 ];
 
@@ -87,7 +108,15 @@ async function mockApi(page: Page) {
     }
 
     if (url.pathname === "/courses") {
-      await route.fulfill({ json: { courses } });
+      const scope = url.searchParams.get("scope") ?? "mine";
+      await route.fulfill({
+        json: {
+          courses:
+            scope === "all"
+              ? courses
+              : courses.filter((course) => course.creatorId === user.id),
+        },
+      });
       return;
     }
 
@@ -96,8 +125,24 @@ async function mockApi(page: Page) {
       return;
     }
 
+    if (url.pathname === "/courses/course-2") {
+      await route.fulfill({ json: { course: courses[1] } });
+      return;
+    }
+
     if (url.pathname === "/courses/course-1/lessons/") {
       await route.fulfill({ json: { lessons } });
+      return;
+    }
+
+    if (url.pathname === "/courses/course-2/lessons/") {
+      await route.fulfill({
+        json: {
+          lessons: externalLessons.filter(
+            (lesson) => lesson.status === "published",
+          ),
+        },
+      });
       return;
     }
 
@@ -148,6 +193,19 @@ test("dashboard handles dense course content", async ({ page }, testInfo) => {
   await capture(page, testInfo, "dashboard");
 });
 
+test("dashboard shows all courses in read-only catalog", async ({ page }, testInfo) => {
+  await mockApi(page);
+  await page.goto("/dashboard?tab=all");
+  await expect(
+    page.getByRole("tab", { name: "Todos os cursos", selected: true }),
+  ).toBeVisible();
+  await expect(page.getByText(courses[1].name)).toBeVisible();
+  await expect(
+    page.getByText("Cursos da plataforma em modo leitura."),
+  ).toBeVisible();
+  await capture(page, testInfo, "dashboard-all-courses");
+});
+
 test("course details handle lesson controls", async ({ page }, testInfo) => {
   await mockApi(page);
   await page.goto("/courses/course-1");
@@ -160,4 +218,31 @@ test("course details handle lesson controls", async ({ page }, testInfo) => {
   await expect(page.getByText("Helena Martins")).toBeVisible();
   await expect(page.getByText(lessons[0].title)).toBeVisible();
   await capture(page, testInfo, "course-details");
+});
+
+test("course details hide management controls in catalog mode", async ({
+  page,
+}, testInfo) => {
+  await mockApi(page);
+  await page.goto("/courses/course-2?scope=all");
+  await expect(
+    page.getByRole("heading", { name: courses[1].name }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Apenas aulas publicadas estao disponiveis."),
+  ).toBeVisible();
+  await expect(page.getByText(externalLessons[0].title)).toBeVisible();
+  const videoLink = page.getByRole("link", { name: "Abrir video" });
+  await expect(videoLink).toBeVisible();
+  await expect(videoLink).toHaveAttribute(
+    "href",
+    "https://videos.example.com/cursos/ux-research/aula-01",
+  );
+  await expect(page.getByText("Rascunho privado do criador")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Rascunho" })).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Criar aula" }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Editar" })).toHaveCount(0);
+  await capture(page, testInfo, "course-details-read-only");
 });

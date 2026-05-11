@@ -14,7 +14,6 @@ export function makeGetCourseController(useCase: GetCourseUseCase) {
   ) {
     const result = await useCase.execute({
       id: request.params.id,
-      userId: request.user.sub,
     });
 
     return reply.send(result);

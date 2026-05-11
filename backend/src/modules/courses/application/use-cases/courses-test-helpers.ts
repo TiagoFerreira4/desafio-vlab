@@ -24,6 +24,14 @@ export class InMemoryCoursesRepository implements CoursesRepository {
     });
   }
 
+  async findMany(input: { search?: string }) {
+    const search = input.search?.toLowerCase();
+
+    return [...this.items.values()].filter(
+      (course) => !search || course.name.toLowerCase().includes(search),
+    );
+  }
+
   async findById(id: string) {
     return this.items.get(id) ?? null;
   }

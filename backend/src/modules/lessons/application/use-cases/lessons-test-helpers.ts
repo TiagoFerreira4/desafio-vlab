@@ -1,4 +1,5 @@
 import { Lesson } from "../../domain/entities/lesson.js";
+import type { LessonStatus } from "../../domain/entities/lesson.js";
 import type { LessonsRepository } from "../../domain/repositories/lessons-repository.js";
 
 interface CreateLessonTestInput {
@@ -11,10 +12,13 @@ interface CreateLessonTestInput {
 export class InMemoryLessonsRepository implements LessonsRepository {
   public readonly items = new Map<string, Lesson>();
 
-  async findManyByCourseId(courseId: string) {
-    return [...this.items.values()].filter(
-      (lesson) => lesson.courseId === courseId,
-    );
+  async findManyByCourseId(input: { courseId: string; status?: LessonStatus }) {
+    return [...this.items.values()].filter((lesson) => {
+      const belongsToCourse = lesson.courseId === input.courseId;
+      const matchesStatus = !input.status || lesson.status === input.status;
+
+      return belongsToCourse && matchesStatus;
+    });
   }
 
   async findById(id: string) {

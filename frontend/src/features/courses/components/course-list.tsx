@@ -5,17 +5,21 @@ import { formatDate } from "../../../shared/utils/date-format";
 import type { Course } from "../types";
 
 type CourseListProps = {
+  canManage: boolean;
   courses: Course[];
   deletingCourseId?: string | null;
   editingCourseId?: string | null;
-  onDelete: (course: Course) => void;
-  onEdit: (course: Course) => void;
+  linkScope: "mine" | "all";
+  onDelete?: (course: Course) => void;
+  onEdit?: (course: Course) => void;
 };
 
 export function CourseList({
+  canManage,
   courses,
   deletingCourseId,
   editingCourseId,
+  linkScope,
   onDelete,
   onEdit,
 }: CourseListProps) {
@@ -50,31 +54,35 @@ export function CourseList({
             <div className="course-card-actions">
               <Link
                 className="button-link secondary-button"
-                to={`/courses/${course.id}`}
+                to={`/courses/${course.id}?scope=${linkScope}`}
               >
                 <Eye aria-hidden="true" size={18} />
                 Ver aulas
               </Link>
 
-              <button
-                className={isEditing ? "editing-button" : "secondary-button"}
-                disabled={isEditing || isDeleting}
-                onClick={() => onEdit(course)}
-                type="button"
-              >
-                <Pencil aria-hidden="true" size={18} />
-                {isEditing ? "Editando" : "Editar"}
-              </button>
+              {canManage && onEdit && onDelete ? (
+                <>
+                  <button
+                    className={isEditing ? "editing-button" : "secondary-button"}
+                    disabled={isEditing || isDeleting}
+                    onClick={() => onEdit(course)}
+                    type="button"
+                  >
+                    <Pencil aria-hidden="true" size={18} />
+                    {isEditing ? "Editando" : "Editar"}
+                  </button>
 
-              <button
-                className="danger-button"
-                disabled={isDeleting}
-                onClick={() => onDelete(course)}
-                type="button"
-              >
-                <Trash2 aria-hidden="true" size={18} />
-                {isDeleting ? "Excluindo..." : "Excluir"}
-              </button>
+                  <button
+                    className="danger-button"
+                    disabled={isDeleting}
+                    onClick={() => onDelete(course)}
+                    type="button"
+                  >
+                    <Trash2 aria-hidden="true" size={18} />
+                    {isDeleting ? "Excluindo..." : "Excluir"}
+                  </button>
+                </>
+              ) : null}
             </div>
           </article>
         );

@@ -1,3 +1,5 @@
+export type CourseScope = "mine" | "all";
+
 export type Course = {
   id: string;
   name: string;

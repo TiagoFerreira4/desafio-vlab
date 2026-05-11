@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { CourseNotFoundError } from "../../domain/errors/course-not-found-error.js";
-import { UnauthorizedCourseActionError } from "../../domain/errors/unauthorized-course-action-error.js";
 import { InMemoryCoursesRepository } from "./courses-test-helpers.js";
 import { GetCourseUseCase } from "./get-course.use-case.js";
 
@@ -19,7 +18,6 @@ describe("GetCourseUseCase", () => {
 
     const result = await useCase.execute({
       id: "course-1",
-      userId: "user-1",
     });
 
     expect(result.course).toMatchObject({
@@ -29,7 +27,7 @@ describe("GetCourseUseCase", () => {
     });
   });
 
-  it("rejects reads from users who do not own the course", async () => {
+  it("allows reads from authenticated users who do not own the course", async () => {
     const coursesRepository = new InMemoryCoursesRepository();
     await coursesRepository.create({
       name: "React Basics",
@@ -40,12 +38,14 @@ describe("GetCourseUseCase", () => {
 
     const useCase = new GetCourseUseCase(coursesRepository);
 
-    await expect(
-      useCase.execute({
-        id: "course-1",
-        userId: "user-2",
-      }),
-    ).rejects.toBeInstanceOf(UnauthorizedCourseActionError);
+    const result = await useCase.execute({
+      id: "course-1",
+    });
+
+    expect(result.course).toMatchObject({
+      id: "course-1",
+      creatorId: "user-1",
+    });
   });
 
   it("rejects unknown courses", async () => {
@@ -54,7 +54,6 @@ describe("GetCourseUseCase", () => {
     await expect(
       useCase.execute({
         id: "missing-course",
-        userId: "user-1",
       }),
     ).rejects.toBeInstanceOf(CourseNotFoundError);
   });

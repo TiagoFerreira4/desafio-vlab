@@ -9,14 +9,16 @@ const statusLabels: Record<Lesson["status"], string> = {
 };
 
 type LessonListProps = {
+  canManage: boolean;
   lessons: Lesson[];
   deletingLessonId?: string | null;
   editingLessonId?: string | null;
-  onDelete: (lesson: Lesson) => void;
-  onEdit: (lesson: Lesson) => void;
+  onDelete?: (lesson: Lesson) => void;
+  onEdit?: (lesson: Lesson) => void;
 };
 
 export function LessonList({
+  canManage,
   lessons,
   deletingLessonId,
   editingLessonId,
@@ -60,27 +62,29 @@ export function LessonList({
               </div>
             </dl>
 
-            <div className="course-card-actions">
-              <button
-                className={isEditing ? "editing-button" : "secondary-button"}
-                disabled={isEditing || isDeleting}
-                onClick={() => onEdit(lesson)}
-                type="button"
-              >
-                <Pencil aria-hidden="true" size={18} />
-                {isEditing ? "Editando" : "Editar"}
-              </button>
+            {canManage && onEdit && onDelete ? (
+              <div className="course-card-actions">
+                <button
+                  className={isEditing ? "editing-button" : "secondary-button"}
+                  disabled={isEditing || isDeleting}
+                  onClick={() => onEdit(lesson)}
+                  type="button"
+                >
+                  <Pencil aria-hidden="true" size={18} />
+                  {isEditing ? "Editando" : "Editar"}
+                </button>
 
-              <button
-                className="danger-button"
-                disabled={isDeleting}
-                onClick={() => onDelete(lesson)}
-                type="button"
-              >
-                <Trash2 aria-hidden="true" size={18} />
-                {isDeleting ? "Excluindo..." : "Excluir"}
-              </button>
-            </div>
+                <button
+                  className="danger-button"
+                  disabled={isDeleting}
+                  onClick={() => onDelete(lesson)}
+                  type="button"
+                >
+                  <Trash2 aria-hidden="true" size={18} />
+                  {isDeleting ? "Excluindo..." : "Excluir"}
+                </button>
+              </div>
+            ) : null}
           </article>
         );
       })}

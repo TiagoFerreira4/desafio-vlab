@@ -32,9 +32,16 @@ function toLessonEntity(lesson: Lesson) {
 export class PrismaLessonsRepository implements LessonsRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findManyByCourseId(courseId: string) {
+  async findManyByCourseId(input: { courseId: string; status?: LessonStatus }) {
     const lessons = await this.prisma.lesson.findMany({
-      where: { courseId },
+      where: {
+        courseId: input.courseId,
+        ...(input.status
+          ? {
+              status: toPrismaLessonStatus(input.status),
+            }
+          : {}),
+      },
       orderBy: {
         createdAt: "asc",
       },

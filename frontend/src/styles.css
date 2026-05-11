@@ -314,6 +314,10 @@ textarea {
   gap: 24px;
 }
 
+.read-only-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .course-form-panel,
 .courses-panel,
 .course-details-summary,
@@ -378,6 +382,40 @@ textarea {
   min-width: 0;
   gap: 18px;
   padding: clamp(20px, 3vw, 26px);
+}
+
+.course-tabs {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 4px;
+  background: var(--color-surface-muted);
+}
+
+.course-tab {
+  min-height: 38px;
+  border-color: transparent;
+  color: var(--color-muted);
+  background: transparent;
+}
+
+.course-tab:hover:not(:disabled) {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.course-tab.active {
+  color: #ffffff;
+  background: var(--color-primary);
+}
+
+.panel-note {
+  margin: 8px 0 0;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .course-details-summary {
@@ -707,6 +745,14 @@ textarea {
 
   .course-search-actions button {
     flex: 1 1 120px;
+  }
+
+  .course-tabs {
+    width: 100%;
+  }
+
+  .course-tab {
+    flex: 1 1 0;
   }
 
   .course-meta {
