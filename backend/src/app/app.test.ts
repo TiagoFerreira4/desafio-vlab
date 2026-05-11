@@ -22,7 +22,10 @@ describe("OpenAPI docs", () => {
     expect(response.statusCode).toBe(200);
 
     const spec = response.json<{
-      paths: Record<string, unknown>;
+      paths: Record<
+        string,
+        Record<string, { tags?: string[] }> | undefined
+      >;
       components?: {
         securitySchemes?: Record<string, unknown>;
       };
@@ -35,5 +38,20 @@ describe("OpenAPI docs", () => {
     expect(spec.paths).toHaveProperty("/courses/{courseId}/lessons/");
     expect(spec.paths).toHaveProperty("/courses/{courseId}/lessons/{lessonId}");
     expect(spec.components?.securitySchemes).toHaveProperty("bearerAuth");
+
+    const lessonCollectionPath = spec.paths["/courses/{courseId}/lessons/"];
+    const lessonResourcePath =
+      spec.paths["/courses/{courseId}/lessons/{lessonId}"];
+
+    expect(lessonCollectionPath).toHaveProperty("get");
+    expect(lessonCollectionPath).toHaveProperty("post");
+    expect(lessonResourcePath).toHaveProperty("get");
+    expect(lessonResourcePath).toHaveProperty("put");
+    expect(lessonResourcePath).toHaveProperty("delete");
+    expect(lessonCollectionPath?.get?.tags).toContain("Lessons");
+    expect(lessonCollectionPath?.post?.tags).toContain("Lessons");
+    expect(lessonResourcePath?.get?.tags).toContain("Lessons");
+    expect(lessonResourcePath?.put?.tags).toContain("Lessons");
+    expect(lessonResourcePath?.delete?.tags).toContain("Lessons");
   });
 });

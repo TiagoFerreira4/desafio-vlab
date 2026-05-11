@@ -8,7 +8,7 @@ import { healthRoutes } from "../shared/http/routes/health.routes.js";
 export async function registerAppRoutes(app: FastifyInstance) {
   await app.register(authRoutes, { prefix: "/auth" });
   await app.register(courseRoutes, { prefix: "/courses" });
-  await app.register(lessonRoutes, { prefix: "/courses/:courseId/lessons" });
+  await app.register(lessonRoutes, { prefix: "/courses" });
   await app.register(healthRoutes);
 
   app.get("/", async () => {

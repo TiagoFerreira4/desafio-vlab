@@ -51,7 +51,7 @@ export async function lessonRoutes(app: FastifyInstance) {
   typedApp.addHook("preHandler", verifyJwt);
 
   typedApp.get(
-    "/",
+    "/:courseId/lessons/",
     {
       schema: listLessonsRouteSchema,
     },
@@ -59,7 +59,7 @@ export async function lessonRoutes(app: FastifyInstance) {
   );
 
   typedApp.get(
-    "/:lessonId",
+    "/:courseId/lessons/:lessonId",
     {
       schema: getLessonRouteSchema,
     },
@@ -67,7 +67,7 @@ export async function lessonRoutes(app: FastifyInstance) {
   );
 
   typedApp.post(
-    "/",
+    "/:courseId/lessons/",
     {
       schema: createLessonRouteSchema,
     },
@@ -75,7 +75,7 @@ export async function lessonRoutes(app: FastifyInstance) {
   );
 
   typedApp.put(
-    "/:lessonId",
+    "/:courseId/lessons/:lessonId",
     {
       schema: updateLessonRouteSchema,
     },
@@ -83,7 +83,7 @@ export async function lessonRoutes(app: FastifyInstance) {
   );
 
   typedApp.delete(
-    "/:lessonId",
+    "/:courseId/lessons/:lessonId",
     {
       schema: deleteLessonRouteSchema,
     },
