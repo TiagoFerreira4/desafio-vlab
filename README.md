@@ -22,6 +22,32 @@ Aplicacao full stack para gestao de cursos online e aulas. O projeto tem API RES
 - pnpm 10.
 - Docker e Docker Compose.
 
+## Deploy
+
+O projeto possui deploy em producao com frontend na Vercel e backend no Render.
+
+```text
+Frontend: https://desafio-vlab-frontend.vercel.app
+Backend:  https://desafio-vlab-backend.onrender.com
+Swagger:  apenas em no env de desenvolvimento
+Health:   https://desafio-vlab-backend.onrender.com/health
+Banco:    Render PostgreSQL
+```
+
+No frontend, a variavel `VITE_API_URL` deve apontar para a URL publica do backend no Render, por exemplo:
+
+```env
+VITE_API_URL=https://desafio-vlab-backend.onrender.com
+```
+
+No backend, a variavel `CORS_ORIGIN` deve incluir a URL do frontend na Vercel:
+
+```env
+CORS_ORIGIN=https://desafio-vlab-frontend.vercel.app,http://localhost:5173,http://127.0.0.1:5173
+```
+
+Observacao: o backend e o banco estao no plano gratuito do Render. Por isso, a primeira requisicao apos um periodo sem uso pode demorar um pouco enquanto o servico acorda. Isso pode afetar principalmente o primeiro cadastro/login; depois que o servico esta ativo, as proximas requisicoes tendem a responder mais rapido.
+
 ## Setup Local
 
 Instale as dependencias na raiz do projeto:
@@ -143,15 +169,15 @@ Depois disso, rotas protegidas como `/auth/me`, `/courses` e `/courses/:courseId
 
 Todas as rotas de cursos exigem autenticacao via Bearer Token.
 
-| Metodo | Rota | Descricao |
-| --- | --- | --- |
-| `GET` | `/courses` | Lista os cursos criados pelo usuario autenticado. Equivale a `scope=mine`. |
-| `GET` | `/courses?scope=mine&search=react` | Lista os cursos do usuario filtrando pelo nome. A busca e parcial e case-insensitive. |
-| `GET` | `/courses?scope=all&search=react` | Lista todos os cursos da plataforma para usuarios autenticados, em modo leitura no frontend. |
-| `GET` | `/courses/:id` | Busca um curso especifico. Qualquer usuario autenticado pode visualizar. |
-| `POST` | `/courses` | Cria um novo curso para o usuario autenticado. |
-| `PUT` | `/courses/:id` | Atualiza um curso do usuario autenticado. Deve enviar o corpo completo do curso. |
-| `DELETE` | `/courses/:id` | Remove um curso do usuario autenticado. |
+| Metodo   | Rota                               | Descricao                                                                                    |
+| -------- | ---------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GET`    | `/courses`                         | Lista os cursos criados pelo usuario autenticado. Equivale a `scope=mine`.                   |
+| `GET`    | `/courses?scope=mine&search=react` | Lista os cursos do usuario filtrando pelo nome. A busca e parcial e case-insensitive.        |
+| `GET`    | `/courses?scope=all&search=react`  | Lista todos os cursos da plataforma para usuarios autenticados, em modo leitura no frontend. |
+| `GET`    | `/courses/:id`                     | Busca um curso especifico. Qualquer usuario autenticado pode visualizar.                     |
+| `POST`   | `/courses`                         | Cria um novo curso para o usuario autenticado.                                               |
+| `PUT`    | `/courses/:id`                     | Atualiza um curso do usuario autenticado. Deve enviar o corpo completo do curso.             |
+| `DELETE` | `/courses/:id`                     | Remove um curso do usuario autenticado.                                                      |
 
 Payload para criacao e atualizacao:
 
@@ -178,13 +204,13 @@ Regras principais:
 
 Todas as rotas de aulas exigem autenticacao via Bearer Token e sao aninhadas em um curso.
 
-| Metodo | Rota | Descricao |
-| --- | --- | --- |
-| `GET` | `/courses/:courseId/lessons` | Lista as aulas de um curso. Qualquer usuario autenticado pode visualizar. |
-| `GET` | `/courses/:courseId/lessons/:lessonId` | Busca uma aula especifica do curso. Qualquer usuario autenticado pode visualizar. |
-| `POST` | `/courses/:courseId/lessons` | Cria uma nova aula no curso. |
-| `PUT` | `/courses/:courseId/lessons/:lessonId` | Atualiza uma aula do curso. Deve enviar o corpo completo da aula. |
-| `DELETE` | `/courses/:courseId/lessons/:lessonId` | Remove uma aula do curso. |
+| Metodo   | Rota                                   | Descricao                                                                         |
+| -------- | -------------------------------------- | --------------------------------------------------------------------------------- |
+| `GET`    | `/courses/:courseId/lessons`           | Lista as aulas de um curso. Qualquer usuario autenticado pode visualizar.         |
+| `GET`    | `/courses/:courseId/lessons/:lessonId` | Busca uma aula especifica do curso. Qualquer usuario autenticado pode visualizar. |
+| `POST`   | `/courses/:courseId/lessons`           | Cria uma nova aula no curso.                                                      |
+| `PUT`    | `/courses/:courseId/lessons/:lessonId` | Atualiza uma aula do curso. Deve enviar o corpo completo da aula.                 |
+| `DELETE` | `/courses/:courseId/lessons/:lessonId` | Remove uma aula do curso.                                                         |
 
 Payload para criacao e atualizacao:
 
